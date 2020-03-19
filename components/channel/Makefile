@@ -10,8 +10,10 @@ BUILD_DIR:=$(BUILD_ROOT)/build
 BUILD_TESTS:=true
 
 # Application Names (Align With Knative Eventing Version)
-APP_NAME=knative-kafka-channel
-APP_VERSION=latest
+#APP_NAME=knative-kafka-channel
+APP_NAME=knative-kafka-channel/dev
+#APP_VERSION=latest
+APP_VERSION=tdn
 
 # Build / Packaging / Deployment Configuration
 APP_PATH=eu.gcr.io/kyma-project/incubator

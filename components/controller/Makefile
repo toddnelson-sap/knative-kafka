@@ -12,6 +12,7 @@ BUILD_TESTS:=true
 # Application Names (Align With Knative Eventing Version)
 APP_NAME=kafka-channel-controller
 APP_VERSION=latest
+BASE_IMAGE_NAME=knative-kafka-base
 
 # Build / Packaging / Deployment Configuration
 APP_PATH=eu.gcr.io/kyma-project/incubator
@@ -94,7 +95,6 @@ build-linux: clean
 
 .PHONY: build-native build-linux
 
-
 #
 # Package & Push Docker Container
 #
@@ -109,6 +109,18 @@ docker-push: docker-build
 	docker push $(APP_PATH)/$(APP_TAG)
 
 .PHONY: docker-build docker-push
+
+docker-build-base:
+	@echo 'Building $(APP_NAME) Base Docker Image'
+	docker build --rm -t $(BASE_IMAGE_NAME) -f ./base.Dockerfile ../..
+	#docker tag $(BASE_IMAGE_NAME) $(APP_PATH)/$(BASE_IMAGE_NAME)
+	docker tag $(BASE_IMAGE_NAME) konduit.docker.repositories.sap.ondemand.com/com.sap.c4konduit/$(BASE_IMAGE_NAME):tdn
+
+docker-push-base: docker-build-base
+	@echo 'Pushing $(BASE_IMAGE_NAME) Docker Container'
+	docker push konduit.docker.repositories.sap.ondemand.com/com.sap.c4konduit/$(BASE_IMAGE_NAME):tdn
+
+.PHONY: docker-build-base docker-push-base
 
 #
 # Support Prow
