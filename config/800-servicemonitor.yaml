@@ -1,0 +1,70 @@
+# Prometheus ServiceMonitor For ALL Knative-Kafka Dispatcher Pods (Kafka Consumers)
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: knative-kafka-dispatchers
+  namespace: knative-eventing
+  labels:
+    helm.sh/chart: knative-kafka
+    app: knative-kafka-channel-controller
+    prometheus: monitoring
+spec:
+  selector:
+    matchLabels:
+      k8s-app: knative-kafka-dispatchers
+  targetLabels:
+  - k8s-app
+  endpoints:
+  - port: metrics
+    interval: 10s
+  namespaceSelector:
+    matchNames:
+    - knative-eventing
+---
+
+# Prometheus ServiceMonitor For ALL Knative-Kafka Channel Pods (Kafka Producers)
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: knative-kafka-channels
+  namespace: knative-eventing
+  labels:
+    helm.sh/chart: knative-kafka
+    app: knative-kafka-channel-controller
+    prometheus: monitoring
+spec:
+  selector:
+    matchLabels:
+      k8s-app: knative-kafka-channels
+  targetLabels:
+  - k8s-app
+  endpoints:
+  - port: metrics
+    interval: 10s
+  namespaceSelector:
+    matchNames:
+    - knative-eventing
+---
+
+# Prometheus ServiceMonitor For Knative-Kafka-Controller
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: knative-kafka-channel-controller
+  namespace: knative-eventing
+  labels:
+    helm.sh/chart: knative-kafka
+    app: knative-kafka-channel-controller
+    prometheus: monitoring
+spec:
+  selector:
+    matchLabels:
+      k8s-app: knative-kafka-channel-controller
+  targetLabels:
+  - k8s-app
+  endpoints:
+  - port: metrics
+    interval: 10s
+  namespaceSelector:
+    matchNames:
+    - knative-eventing

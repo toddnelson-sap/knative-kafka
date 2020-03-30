@@ -1,0 +1,1 @@
+defaultBaseImage: konduit.docker.repositories.sap.ondemand.com/com.sap.c4konduit/knative-kafka-base:tdn

@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: knative-kafka-channel-controller
+  namespace: knative-eventing
+  labels:
+    app: knative-kafka-channel-controller
+    helm.sh/chart: knative-kafka
+spec:
+  replicas:
+  selector:
+    matchLabels:
+      app: knative-kafka-channel-controller
+      name: knative-kafka-channel-controller
+  template:
+    metadata:
+      labels:
+        app: knative-kafka-channel-controller
+        name: knative-kafka-channel-controller
+    spec:
+      serviceAccountName: knative-kafka-channel-controller
+      containers:
+      - name: knative-kafka
+        #image: eu.gcr.io/kyma-project/incubator/kafka-channel-controller:latest
+        image: ko://github.com/kyma-incubator/knative-kafka/components/controller/cmd
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8081
+          name: metrics
+        env:
+        - name: SYSTEM_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
+        - name: METRICS_PORT
+          value: "8081"
+        - name: METRICS_DOMAIN
+          value: "knative.dev/eventing"
+        - name: KAFKA_PROVIDER
+          value: "local"
+        - name: KAFKA_OFFSET_COMMIT_MESSAGE_COUNT
+          value: "50"
+        - name: KAFKA_OFFSET_COMMIT_DURATION_MILLIS
+          value: "5000"
+        - name: KAFKA_OFFSET_COMMIT_ASYNC
+          value: "false"
+        - name: CHANNEL_IMAGE
+          value: "eu.gcr.io/kyma-project/incubator/knative-kafka-channel:latest"
+        - name: CHANNEL_REPLICAS
+          value: "1"
+        - name: DISPATCHER_IMAGE
+          value: "eu.gcr.io/kyma-project/incubator/knative-kafka-dispatcher:latest"
+        - name: DEFAULT_NUM_PARTITIONS
+          value: "4"
+        - name: DEFAULT_REPLICATION_FACTOR
+          value: "1"
+        - name: DEFAULT_RETENTION_MILLIS
+          value: "604800000"
+        - name: DEFAULT_KAFKA_CONSUMERS
+          value: "4"
+        - name: "DISPATCHER_REPLICAS"
+          value: "1"
+        - name: DISPATCHER_RETRY_INITIAL_INTERVAL_MILLIS
+          value: "500"
+        - name: DISPATCHER_RETRY_TIME_MILLIS
+          value: "300000"
+        - name: DISPATCHER_RETRY_EXPONENTIAL_BACKOFF
+          value: "true"
+        - name: DISPATCHER_CPU_REQUEST
+          value: "300m"
+        - name: DISPATCHER_CPU_LIMIT
+          value: "500m"
+        - name: DISPATCHER_MEMORY_REQUEST
+          value: "50Mi"
+        - name: DISPATCHER_MEMORY_LIMIT
+          value: "128Mi"
+        - name: CHANNEL_MEMORY_REQUEST
+          value: "50Mi"
+        - name: CHANNEL_MEMORY_LIMIT
+          value: "100Mi"
+        - name: CHANNEL_CPU_REQUEST
+          value: "100m"
+        - name: CHANNEL_CPU_LIMIT
+          value: "200m"
+        resources:
+          requests:
+            cpu: 20m
+            memory: 25Mi
+          limits:
+            cpu: 100m
+            memory: 50Mi
+        volumeMounts:
+        - mountPath: "/etc/knative-kafka"
+          name: "logging-config"
+      volumes:
+      - name: "logging-config"
+        configMap:
+          defaultMode: 420
+          name: "knative-kafka-logging"
